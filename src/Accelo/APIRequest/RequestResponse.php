@@ -10,6 +10,7 @@
 		public string $apiStatus;
 		public string $apiMessage;
 		public string $apiMoreInfo;
+		public bool $hasMorePages;
 		public RequestType $requestType;
 
 		// Results
