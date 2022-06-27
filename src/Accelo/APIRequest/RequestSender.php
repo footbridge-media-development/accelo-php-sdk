@@ -149,9 +149,9 @@
 			if ($statusCode === 200){
 
 				$headers = $response->getHeaders();
-				$rateLimitResetTimestamp = (int) $headers['X-RateLimit-Reset'];
-				$rateLimitRemaining = (int) $headers['X-RateLimit-Remaining'];
-				$rateLimitMaxAllowedLimit = (int) $headers['X-RateLimit-Limit'];
+				$rateLimitResetTimestamp = (int) $headers['X-RateLimit-Reset'][0];
+				$rateLimitRemaining = (int) $headers['X-RateLimit-Remaining'][0];
+				$rateLimitMaxAllowedLimit = (int) $headers['X-RateLimit-Limit'][0];
 
 				/** @var array{response: array, meta:array} $apiResponse */
 				$apiResponse = json_decode($response->getBody()->getContents(), true);
