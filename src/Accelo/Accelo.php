@@ -8,6 +8,8 @@
 	use FootbridgeMedia\Accelo\APIRequest\RequestSender;
 	use FootbridgeMedia\Accelo\Authentication\Authentication;
 	use FootbridgeMedia\Accelo\ClientCredentials\ClientCredentials;
+	use FootbridgeMedia\Resources\Exceptions\APIException;
+	use GuzzleHttp\Exception\GuzzleException;
 
 	class Accelo{
 		private ClientCredentials $clientCredentials;
@@ -22,8 +24,45 @@
 		}
 
 		/**
+		 * Requests an authorization from a user
+		 * @throws APIException
+		 */
+		public function getAuthorizationURL(string $scope): string{
+			$requestSender = new RequestSender();
+			$requestSender->clientCredentials = $this->clientCredentials;
+
+			$requestResponse = $requestSender->getAuthorizationURL(
+				scope: $scope,
+			);
+
+			return $requestResponse->response->getHeaderLine("location");
+		}
+
+		/**
+		 * Uses an access code obtained from an authorization request to fetch the access tokens array.
+		 * @throws APIException|GuzzleException
+		 * @returns array{deployment_name: string, token_type: string, access_token: string, refresh-token: string, deployment_uri: string, deployment: string, expires_in: int, account_details:array}
+		 */
+		public function getTokensFromAccessCode(
+			string $accessCode,
+			int $expiresInSeconds,
+		): array{
+			$requestSender = new RequestSender();
+			$requestSender->clientCredentials = $this->clientCredentials;
+
+			$requestResponse = $requestSender->getTokensFromAccessCode(
+				accessCode: $accessCode,
+				expiresInSeconds: $expiresInSeconds,
+			);
+
+			$tokens = json_decode($requestResponse->responseBody, true);
+
+			return $tokens;
+		}
+
+		/**
 		 * @throws \GuzzleHttp\Exception\GuzzleException
-		 * @throws \FootbridgeMedia\Resources\Exceptions\APIException
+		 * @throws APIException
 		 */
 		public function list(
 			string $endpoint,
