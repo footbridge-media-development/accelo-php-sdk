@@ -10,7 +10,7 @@ First, you must setup authentication and credentials before requests will be suc
 
 Install using composer
 ```
-composer require footbridge-media-development/accelo-php-sdk
+composer require footbridge-media/accelo-php-sdk
 ```
 
 ### Initiate a New Accelo Object
