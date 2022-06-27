@@ -57,14 +57,20 @@
 							}elseif ($nameOfType === "array"){
 								$object->{$property->name} = $objectFromAPI[$property->name];
 							}elseif (class_exists(class: $nameOfType)){
-								// It's a class type
-								$newObject = new $nameOfType();
-								// Recursively call this same method and populate the new object
-								$this->hydrateObject(
-									object: $newObject,
-									objectFromAPI: $objectFromAPI[$property->name],
-								);
-								$object->{$property->name} = $newObject;
+								// Check if the API object is an object and not a string/int
+								// This happens in the case where a field could be - for example - the ID of a staff
+								// or the object of the staff member itself
+								if (is_array($objectFromAPI[$property->name])) {
+									// It's a class type
+									$newObject = new $nameOfType();
+
+									// Recursively call this same method and populate the new object
+									$this->hydrateObject(
+										object: $newObject,
+										objectFromAPI: $objectFromAPI[$property->name],
+									);
+									$object->{$property->name} = $newObject;
+								}
 							}
 						}
 					}elseif ($declaredType instanceof \ReflectionNamedType){
