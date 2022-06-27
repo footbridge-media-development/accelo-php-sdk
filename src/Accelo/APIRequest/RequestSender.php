@@ -9,6 +9,8 @@
 	use FootbridgeMedia\Accelo\ClientCredentials\ClientCredentials;
 	use FootbridgeMedia\Resources\Exceptions\APIException;
 	use GuzzleHttp\Client;
+	use GuzzleHttp\Exception\ClientException;
+	use GuzzleHttp\Exception\GuzzleException;
 	use GuzzleHttp\RequestOptions;
 
 	class RequestSender{
@@ -23,6 +25,13 @@
 				self::API_URL,
 				$this->clientCredentials->deploymentName
 			) . "/api/" . self::API_VERSION . $path;
+		}
+
+		private function getOAuthFullURL(string $path): string{
+			return sprintf(
+					self::API_URL,
+					$this->clientCredentials->deploymentName
+				) . "/oauth2/" . self::API_VERSION . $path;
 		}
 
 		private function getBearerAuthenticationStringFromWebToken(): string{
@@ -98,7 +107,7 @@
 		}
 
 		/**
-		 * @throws \GuzzleHttp\Exception\GuzzleException
+		 * @throws GuzzleException
 		 * @throws APIException
 		 */
 		public function listObjects(
@@ -155,12 +164,13 @@
 			if ($statusCode === 200){
 
 				$headers = $response->getHeaders();
+				$responseBody = $response->getBody()->getContents();
 				$rateLimitResetTimestamp = (int) $headers['X-RateLimit-Reset'][0];
 				$rateLimitRemaining = (int) $headers['X-RateLimit-Remaining'][0];
 				$rateLimitMaxAllowedLimit = (int) $headers['X-RateLimit-Limit'][0];
 
 				/** @var array{response: array, meta:array} $apiResponse */
-				$apiResponse = json_decode($response->getBody()->getContents(), true);
+				$apiResponse = json_decode($responseBody, true);
 				$objectsListed = $apiResponse['response'];
 				$acceloObjectsParsed = [];
 
@@ -168,6 +178,7 @@
 				$apiMeta = $apiResponse['meta'];
 
 				$requestResponse = new RequestResponse;
+				$requestResponse->responseBody = $responseBody;
 				$requestResponse->httpStatus = $statusCode;
 				$requestResponse->apiStatus = $apiMeta['status'];
 				$requestResponse->apiMessage = $apiMeta['message'];
@@ -191,14 +202,139 @@
 
 				return $requestResponse;
 			}else{
+				$responseBody = $response->getBody()->getContents();
+
 				/** @var array{response: null, meta:array} $apiResponse */
-				$apiResponse = json_decode($response->getBody()->getContents(), true);
+				$apiResponse = json_decode($responseBody, true);
 				/** @var array{message: string, status: string, more_info:string} $apiMeta */
 				$apiMeta = $apiResponse['meta'];
 				$apiException = new APIException;
 				$apiException->apiErrorMessage = $apiMeta['message'];
 				$apiException->apiStatus = $apiMeta['status'];
 				$apiException->httpStatusCode = $statusCode;
+				throw $apiException;
+			}
+		}
+
+		/**
+		 * @throws APIException|GuzzleException
+		 */
+		public function getAuthorizationURL(
+			string $scope,
+		): RequestResponse{
+
+			$client = new Client();
+			$clientID = $this->clientCredentials->clientID;
+
+			$postParameters = [
+				"client_id"=>$clientID,
+				"response_type"=>"code",
+				"scope"=>$scope,
+			];
+
+			try {
+				$response = $client->request(
+					method: "POST",
+					uri: $this->getOAuthFullURL("/authorize"),
+					options: [
+						RequestOptions::ALLOW_REDIRECTS => false, // So the Location header is present
+						RequestOptions::FORM_PARAMS => $postParameters,
+					],
+				);
+
+				$statusCode = $response->getStatusCode();
+				$responseBody = $response->getBody()->getContents();
+				$requestResponse = new RequestResponse;
+				$requestResponse->response = $response;
+				$requestResponse->httpStatus = $statusCode;
+				$requestResponse->responseBody = $responseBody;
+				$requestResponse->requestType = RequestType::GET_AUTHORIZATION_URL;
+
+				return $requestResponse;
+			}catch(ClientException $e){
+				$jsonData = $e->getResponse()->getBody()->getContents();
+				/** @var array{error_description: string, error: string} $errorData */
+				$errorData = json_decode($jsonData, true);
+
+				$apiException = new APIException;
+				$apiException->apiErrorMessage = $errorData['error_description'];
+				$apiException->apiStatus = $errorData['error'];
+				$apiException->httpStatusCode = $e->getResponse()->getStatusCode();
+				throw $apiException;
+			}
+		}
+
+		/**
+		 * @throws APIException
+		 * @throws GuzzleException
+		 */
+		public function getTokensFromAccessCode(
+			string $accessCode,
+			int $expiresInSeconds,
+		): RequestResponse{
+
+			$client = new Client();
+			$clientID = $this->clientCredentials->clientID;
+			$clientSecret = $this->clientCredentials->clientSecret;
+			$basicAuthentication = sprintf(
+				"Basic %s",
+				base64_encode(
+					sprintf(
+						"%s:%s",
+						$clientID,
+						$clientSecret,
+					),
+				),
+			);
+
+			$postParameters = [
+				"grant_type"=>"authorization_code",
+				"code"=>$accessCode,
+				"expires_in"=>$expiresInSeconds,
+			];
+
+			try {
+				$response = $client->request(
+					method: "POST",
+					uri: $this->getOAuthFullURL("/token"),
+					options: [
+						RequestOptions::HEADERS => [
+							"Authorization" => $basicAuthentication,
+						],
+						RequestOptions::FORM_PARAMS => $postParameters,
+					],
+				);
+
+				$statusCode = $response->getStatusCode();
+				if ($statusCode === 200) {
+
+					$responseBody = $response->getBody()->getContents();
+					$requestResponse = new RequestResponse;
+					$requestResponse->httpStatus = $statusCode;
+					$requestResponse->responseBody = $responseBody;
+					$requestResponse->requestType = RequestType::GET_TOKENS_FROM_ACCESS_CODE;
+
+					return $requestResponse;
+				} else {
+					/** @var array{response: null, meta:array} $apiResponse */
+					$apiResponse = json_decode($response->getBody()->getContents(), true);
+					/** @var array{message: string, status: string, more_info:string} $apiMeta */
+					$apiMeta = $apiResponse['meta'];
+					$apiException = new APIException;
+					$apiException->apiErrorMessage = $apiMeta['message'];
+					$apiException->apiStatus = $apiMeta['status'];
+					$apiException->httpStatusCode = $statusCode;
+					throw $apiException;
+				}
+			}catch(ClientException $e){
+				$jsonData = $e->getResponse()->getBody()->getContents();
+				/** @var array{error_description: string, error: string} $errorData */
+				$errorData = json_decode($jsonData, true);
+
+				$apiException = new APIException;
+				$apiException->apiErrorMessage = $errorData['error_description'];
+				$apiException->apiStatus = $errorData['error'];
+				$apiException->httpStatusCode = $e->getResponse()->getStatusCode();
 				throw $apiException;
 			}
 		}
