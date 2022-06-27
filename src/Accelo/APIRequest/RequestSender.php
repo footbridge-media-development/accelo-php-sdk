@@ -55,7 +55,7 @@
 							}elseif ($nameOfType === "string"){
 								$object->{$property->name} = (string) $objectFromAPI[$property->name];
 							}elseif ($nameOfType === "array"){
-								$object->{$property->name} = json_decode($objectFromAPI[$property->name], true);
+								$object->{$property->name} = $objectFromAPI[$property->name];
 							}elseif (class_exists(class: $nameOfType)){
 								// It's a class type
 								$newObject = new $nameOfType();
@@ -75,7 +75,7 @@
 						}elseif ($nameOfType === "string"){
 							$object->{$property->name} = (string) $objectFromAPI[$property->name];
 						}elseif ($nameOfType === "array"){
-							$object->{$property->name} = json_decode($objectFromAPI[$property->name], true);
+							$object->{$property->name} = $objectFromAPI[$property->name];
 						}elseif (class_exists(class: $nameOfType)){
 							// It's a class type
 							$newObject = new $nameOfType();
