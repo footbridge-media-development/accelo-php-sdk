@@ -37,7 +37,7 @@
 		 * attempts to type-convert and will recursively process additional objects (Such as a Staff object found in
 		 * a Task object property).
 		 */
-		private function populateObjectProperties(object $object, array $objectFromAPI): void{
+		private function hydrateObject(object $object, array $objectFromAPI): void{
 			$classReflection = new \ReflectionClass($object);
 			$properties = $classReflection->getProperties(
 				filter: \ReflectionProperty::IS_PUBLIC,
@@ -60,7 +60,7 @@
 								// It's a class type
 								$newObject = new $nameOfType();
 								// Recursively call this same method and populate the new object
-								$this->populateObjectProperties(
+								$this->hydrateObject(
 									object: $newObject,
 									objectFromAPI: $objectFromAPI[$property->name],
 								);
@@ -80,7 +80,7 @@
 							// It's a class type
 							$newObject = new $nameOfType();
 							// Recursively call this same method and populate the new object
-							$this->populateObjectProperties(
+							$this->hydrateObject(
 								object: $newObject,
 								objectFromAPI: $objectFromAPI[$property->name],
 							);
@@ -149,9 +149,9 @@
 			if ($statusCode === 200){
 
 				$headers = $response->getHeaders();
-				$rateLimitResetTimestamp = (int) $headers['X-RateLimit-Reset'];
-				$rateLimitRemaining = (int) $headers['X-RateLimit-Remaining'];
-				$rateLimitMaxAllowedLimit = (int) $headers['X-RateLimit-Limit'];
+				$rateLimitResetTimestamp = (int) $headers['X-RateLimit-Reset'][0];
+				$rateLimitRemaining = (int) $headers['X-RateLimit-Remaining'][0];
+				$rateLimitMaxAllowedLimit = (int) $headers['X-RateLimit-Limit'][0];
 
 				/** @var array{response: array, meta:array} $apiResponse */
 				$apiResponse = json_decode($response->getBody()->getContents(), true);
@@ -173,7 +173,7 @@
 
 				foreach($objectsListed as $objectFromAPI){
 					$newAcceloObject = new $objectType;
-					$this->populateObjectProperties(
+					$this->hydrateObject(
 						object: $newAcceloObject,
 						objectFromAPI: $objectFromAPI,
 					);
