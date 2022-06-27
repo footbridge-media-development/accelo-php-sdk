@@ -9,6 +9,7 @@
 	use FootbridgeMedia\Accelo\Authentication\WebAuthentication;
 	use FootbridgeMedia\Accelo\ClientCredentials\ClientCredentials;
 	use FootbridgeMedia\Accelo\Companies\Company;
+	use FootbridgeMedia\Accelo\Companies\Segmentation;
 	use PHPUnit\Framework\TestCase;
 
 
@@ -70,5 +71,44 @@
 				expected:"Footbridge Media",
 				actual:$company->name,
 			);
+		}
+
+		public function testListCompanySegmentations(){
+
+			$search = new Search();
+			$search->setQuery("Footbridge Media");
+
+			$filters = new Filters();
+			$filters->addFilter(
+				filterName:"standing",
+				filterValue: "active",
+			);
+
+			$requestResponse = self::$accelo->list(
+				endpoint: "/companies",
+				objectType: Company::class,
+				filters: $filters,
+				search: $search,
+			);
+
+			/** @var Company[] $companies */
+			$companies = $requestResponse->getListResult();
+
+			$this->assertCount(
+				expectedCount: 1,
+				haystack:$companies,
+			);
+
+			$company = $companies[0];
+
+			$segmentationResponse = self::$accelo->list(
+				endpoint: sprintf("/companies/%d/segmentations", $company->id),
+				objectType: Segmentation::class,
+				filters: $filters,
+				search: $search,
+			);
+
+			/** @var Segmentation[] $segmentations */
+			$segmentations = $segmentationResponse->getListResult();
 		}
 	}
