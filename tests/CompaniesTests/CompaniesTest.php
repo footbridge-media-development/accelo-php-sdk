@@ -3,6 +3,7 @@
 	require_once __DIR__ . "/../test-env.php";
 
 	use FootbridgeMedia\Accelo\Accelo;
+	use FootbridgeMedia\Accelo\APIRequest\Paginator;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\AdditionalFields;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Filters;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Search;
@@ -74,6 +75,67 @@
 				expected:"Footbridge Media",
 				actual:$company->name,
 			);
+		}
+
+		public function testPagination(){
+
+			$filters = new Filters();
+
+			$filters->addFilter(
+				filterName:"standing",
+				filterValue: "active",
+			);
+
+			$filters->addFilter(
+				filterName:"order_by_asc",
+				filterValue: "name",
+			);
+
+			$paginator = new Paginator();
+			$paginator->setLimit(1);
+			$paginator->setPage(0);
+
+			$requestResponse = self::$accelo->list(
+				endpoint: "/companies",
+				objectType: Company::class,
+				filters: $filters,
+				paginator: $paginator,
+			);
+
+			/** @var Company[] $companies */
+			$companies = $requestResponse->getListResult();
+
+			$this->assertCount(
+				expectedCount: 1,
+				haystack:$companies,
+			);
+
+			$firstCompanyFromFirstAPICall = $companies[0];
+
+			$this->assertTrue(
+				$requestResponse->hasMorePages,
+			);
+
+			if ($requestResponse->hasMorePages){
+				// Increment the paginator
+				$paginator->incrementPage();
+				// Perform another request and confirm that it is different from the first company
+				$requestResponse2 = self::$accelo->list(
+					endpoint: "/companies",
+					objectType: Company::class,
+					filters: $filters,
+					paginator: $paginator,
+				);
+
+				/** @var Company[] $companies */
+				$companies = $requestResponse2->getListResult();
+				$secondCompanyFromAPICall = $companies[0];
+
+				$this->assertNotEquals(
+					expected: $firstCompanyFromFirstAPICall->name,
+					actual:$secondCompanyFromAPICall->name,
+				);
+			}
 		}
 
 		public function testListCompanySegmentations(){

@@ -1,6 +1,7 @@
 <?php
 	namespace FootbridgeMedia\Accelo;
 
+	use FootbridgeMedia\Accelo\APIRequest\Paginator;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\AdditionalFields;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Filters;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Search;
@@ -70,6 +71,7 @@
 			?AdditionalFields $additionalFields = null,
 			?Filters $filters = null,
 			?Search $search = null,
+			?Paginator $paginator = null,
 		): RequestResponse{
 			$requestSender = new RequestSender();
 			$requestSender->authentication = $this->authentication;
@@ -81,6 +83,7 @@
 				fields:$additionalFields,
 				filters:$filters,
 				search: $search,
+				paginator: $paginator,
 			);
 		}
 	}

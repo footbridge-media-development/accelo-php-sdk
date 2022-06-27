@@ -116,6 +116,7 @@
 			?AdditionalFields $fields,
 			?Filters $filters,
 			?Search $search,
+			?Paginator $paginator,
 		): RequestResponse{
 
 			$client = new Client();
@@ -147,6 +148,14 @@
 				if (!empty($search->getQuery())){
 					$queryParameters['_search'] = $search->getQuery();
 				}
+			}
+
+			// Handle pagination
+			$returnLimit = Paginator::DEFAULT_LIMIT; // Used to tell the RequestResponse if there are more results
+			if ($paginator !== null){
+				$returnLimit = $paginator->getPage();
+				$queryParameters['_page'] = $paginator->getPage();
+				$queryParameters['_limit'] = $paginator->getLimit();
 			}
 
 			$response = $client->request(
@@ -187,6 +196,13 @@
 				$requestResponse->rateLimitResetTimestamp = $rateLimitResetTimestamp;
 				$requestResponse->rateLimitTotalMaxAllowed = $rateLimitMaxAllowedLimit;
 				$requestResponse->requestType = RequestType::LIST;
+
+				if (count($objectsListed) >= $returnLimit){
+					// There _could_ be more results
+					$requestResponse->hasMorePages = true;
+				}else{
+					$requestResponse->hasMorePages = false;
+				}
 
 				foreach($objectsListed as $objectFromAPI){
 					$newAcceloObject = new $objectType;
