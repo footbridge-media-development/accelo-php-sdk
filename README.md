@@ -140,7 +140,7 @@ foreach($companies as $company){
 
 #### Paginating Results
 Accelo's maximum limit on returned results is 100 entries of any object. The default is 10. You can specify which page and what limit you want the list calls to return with a Paginator object. Shown below. We request all companies to be returned with a limit of 15 each API call. Additionally, there is a filter to order them by name in ascending order.
-```
+```php
 // ORDER BY filter
 $filters = new Filters();
 $filters->addFilter(
