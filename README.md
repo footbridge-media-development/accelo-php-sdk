@@ -137,3 +137,51 @@ foreach($companies as $company){
     printf("{$company->name}\n");
 }
 ```
+
+#### Paginating Results
+Accelo's maximum limit on returned results is 100 entries of any object. The default is 10. You can specify which page and what limit you want the list calls to return with a Paginator object. Shown below. We request all companies to be returned with a limit of 15 each API call. Additionally, there is a filter to order them by name in ascending order.
+```
+// ORDER BY filter
+$filters = new Filters();
+$filters->addFilter(
+    filterName:"order_by_asc",
+    filterValue: "name",
+);
+
+$paginator = new Paginator();
+$paginator->setLimit(15);
+$paginator->setPage(0); // Page 0 is the starting page
+
+// Perform the request
+$requestResponse = self::$accelo->list(
+    endpoint: "/companies",
+    objectType: Company::class,
+    filters: $filters,
+    paginator: $paginator,
+);
+
+/** @var Company[] $companies */
+$companies = $requestResponse->getListResult();
+
+foreach($companies as $company){
+    printf("{$company->name}\n");
+}
+
+if ($requestResponse->hasMorePages){
+    // Increment the paginator
+    $paginator->incrementPage();
+    
+    // Repeat the same request
+    $requestResponseNextPage = self::$accelo->list(
+        endpoint: "/companies",
+        objectType: Company::class,
+        filters: $filters,
+        paginator: $paginator,
+    );
+    
+    /** @var Company[] $companies */
+    $companiesFromNextPage = $requestResponseNextPage->getListResult();
+}
+```
+
+As you can see at the bottom, you can use the hasMorePages boolean flag to tell if a response probably has more results to return. Then you would increment the paginator with incrementPage. You can then make the same API call with the same object filters, fields, and same paginator instance but you will receive new results.
