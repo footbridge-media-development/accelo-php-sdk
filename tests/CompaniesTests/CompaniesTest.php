@@ -104,8 +104,6 @@
 			$segmentationResponse = self::$accelo->list(
 				endpoint: sprintf("/companies/%d/segmentations", $company->id),
 				objectType: Segmentation::class,
-				filters: $filters,
-				search: $search,
 			);
 
 			/** @var Segmentation[] $segmentations */
