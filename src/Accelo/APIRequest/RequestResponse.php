@@ -1,8 +1,12 @@
 <?php
 	namespace FootbridgeMedia\Accelo\APIRequest;
 
+	use GuzzleHttp\Psr7\Response;
+
 	class RequestResponse{
 		public int $httpStatus;
+		public Response $response;
+		public string $responseBody;
 		public string $apiStatus;
 		public string $apiMessage;
 		public string $apiMoreInfo;
