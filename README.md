@@ -18,7 +18,7 @@ This library comes with a built-in authenticator for CLI use that will allow you
 
 Make sure to have your Deployment Name, Client ID, and Client Secret handy and then run the following script via the CLI.
 ```
-php src/Resources/CLIScripts/WebAuthenticate.php
+php vendor/footbridge-media/accelo-php-sdk/src/Resources/CLIScripts/WebAuthenticate.php
 ```
 
 Follow the prompts and provide the information they request until it outputs a URL. 
@@ -60,9 +60,9 @@ You may also wish to store the expires_in and expires_on information so you know
 ### Authenticating a Service Application
 If you wish you use a service application instead of authenticating a web user, the process is similar to the above authentication section.
 
-Make sure to have your Deployment Name, Client ID, and Client Secret handy and then run the following script via the CLI.
+Make sure to have your Deployment Name, Client ID, and Client Secret handy and then run the following script via the CLI. Run this script from your application's root.
 ```
-php src/Resources/CLIScripts/ServiceAuthenticate.php
+php vendor/footbridge-media/accelo-php-sdk/src/Resources/CLIScripts/ServiceAuthenticate.php
 ```
 
 Follow the prompts and provide the information they request.
