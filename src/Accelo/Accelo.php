@@ -62,6 +62,28 @@
 		}
 
 		/**
+		 * Authorizes this application as a service application with no individual user authenticated.
+		 * @throws APIException|GuzzleException
+		 * @returns array{deployment_name: string, token_type: string, access_token: string, refresh-token: string, deployment_uri: string, deployment: string, expires_in: int, account_details:array}
+		 */
+		public function getTokensForServiceApplication(
+			string $scope,
+			int $expiresInSeconds,
+		): array{
+			$requestSender = new RequestSender();
+			$requestSender->clientCredentials = $this->clientCredentials;
+
+			$requestResponse = $requestSender->getTokensForServiceApplication(
+				scope: $scope,
+				expiresInSeconds: $expiresInSeconds,
+			);
+
+			$tokens = json_decode($requestResponse->responseBody, true);
+
+			return $tokens;
+		}
+
+		/**
 		 * @throws \GuzzleHttp\Exception\GuzzleException
 		 * @throws APIException
 		 */

@@ -57,6 +57,41 @@ Save your two tokens (access and refresh) for use in this library below. Usually
 
 You may also wish to store the expires_in and expires_on information so you know when you need to renew your tokens. You can now continue to utilizing the rest of this library below.
 
+### Authenticating a Service Application
+If you wish you use a service application instead of authenticating a web user, the process is similar to the above authentication section.
+
+Make sure to have your Deployment Name, Client ID, and Client Secret handy and then run the following script via the CLI.
+```
+php src/Resources/CLIScripts/ServiceAuthenticate.php
+```
+
+Follow the prompts and provide the information they request.
+
+```
+Enter your Accelo deployment name and press enter:
+Enter your Accelo web client ID and press enter:
+Enter your Accelo web client secret key and press enter:
+```
+
+If all the information is correct, then Accelo's oAuth API will authorize your application for 3 years. You will then be given the necessary access_token to use with this library and the Accelo API.
+
+```
+oAuth authorization succeeding. Your access codes and expiratory information is below. Please keep it safe in the dark:
+Array                                                                                 
+(                                                                                     
+    [access_token] => TOKEN_HERE
+    [refresh_token] => 
+    [expires_in] => SECONDS_UNTIL_EXPIRES
+    [expires_on] => DATE_OF_EXPIRATORY
+    [deployment_uri] => DEPLOYMENT_URL
+    [token_type] => TOKEN_TYPE
+)
+```
+
+You will only need to use the access_token for a service application.
+
+You may also wish to store the expires_in and expires_on information so you know when you need to renew your tokens. You can now continue to utilizing the rest of this library below.
+
 ### Initiate a New Accelo Object
 ```php
 use FootbridgeMedia\Accelo\Accelo;
@@ -71,11 +106,18 @@ Currently, only the web authentication is supported. However, there is the frame
 ```php
 use FootbridgeMedia\Accelo\Authentication\AuthenticationType;
 use FootbridgeMedia\Accelo\Authentication\WebAuthentication;
-	
-$webAuthentication = new WebAuthentication();
-$webAuthentication->authType = AuthenticationType::Bearer;
-$webAuthentication->accessToken = "USER_ACCESS_TOKEN";
-$webAuthentication->refreshToken = "USER_REFRESH_TOKEN";
+use FootbridgeMedia\Accelo\Authentication\ServiceAuthentication;
+
+// For web authentication
+$authentication = new WebAuthentication();
+$authentication->authType = AuthenticationType::Bearer;
+$authentication->accessToken = "USER_ACCESS_TOKEN";
+$authentication->refreshToken = "USER_REFRESH_TOKEN";
+
+// For service authentication, use the below INSTEAD of the above
+$authentication = new ServiceAuthentication();
+$authentication->authType = AuthenticationType::Bearer;
+$authentication->accessToken = "SERVICE_ACCESS_TOKEN";
 ```
 
 ### Client Credentials Object
@@ -92,7 +134,7 @@ $clientCredentials->clientSecret = "CLIENT_SECRET";
 Now, register both the authentication and credentials instances with the Accelo object.
 
 ```php
-$accelo->setAuthentication($webAuthentication);
+$accelo->setAuthentication($authentication);
 $accelo->setCredentials($clientCredentials);
 ```
 

@@ -5,6 +5,7 @@
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Filters;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Search;
 	use FootbridgeMedia\Accelo\Authentication\Authentication;
+	use FootbridgeMedia\Accelo\Authentication\ServiceAuthentication;
 	use FootbridgeMedia\Accelo\Authentication\WebAuthentication;
 	use FootbridgeMedia\Accelo\ClientCredentials\ClientCredentials;
 	use FootbridgeMedia\Resources\Exceptions\APIException;
@@ -38,6 +39,12 @@
 			/** @var WebAuthentication $webAuthentication */
 			$webAuthentication = $this->authentication;
 			return sprintf("Bearer %s", $webAuthentication->accessToken);
+		}
+
+		private function getBearerAuthenticationStringFromServiceToken(): string{
+			/** @var ServiceAuthentication $serviceAuthentication */
+			$serviceAuthentication = $this->authentication;
+			return sprintf("Bearer %s", $serviceAuthentication->accessToken);
 		}
 
 		/**
@@ -123,6 +130,8 @@
 
 			if ($this->authentication instanceof WebAuthentication){
 				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
+			}elseif ($this->authentication instanceof ServiceAuthentication){
+				$authorizationString = $this->getBearerAuthenticationStringFromServiceToken();
 			}
 
 			$queryParameters = [];
@@ -306,6 +315,80 @@
 			$postParameters = [
 				"grant_type"=>"authorization_code",
 				"code"=>$accessCode,
+				"expires_in"=>$expiresInSeconds,
+			];
+
+			try {
+				$response = $client->request(
+					method: "POST",
+					uri: $this->getOAuthFullURL("/token"),
+					options: [
+						RequestOptions::HEADERS => [
+							"Authorization" => $basicAuthentication,
+						],
+						RequestOptions::FORM_PARAMS => $postParameters,
+					],
+				);
+
+				$statusCode = $response->getStatusCode();
+				if ($statusCode === 200) {
+
+					$responseBody = $response->getBody()->getContents();
+					$requestResponse = new RequestResponse;
+					$requestResponse->httpStatus = $statusCode;
+					$requestResponse->responseBody = $responseBody;
+					$requestResponse->requestType = RequestType::GET_TOKENS_FROM_ACCESS_CODE;
+
+					return $requestResponse;
+				} else {
+					/** @var array{response: null, meta:array} $apiResponse */
+					$apiResponse = json_decode($response->getBody()->getContents(), true);
+					/** @var array{message: string, status: string, more_info:string} $apiMeta */
+					$apiMeta = $apiResponse['meta'];
+					$apiException = new APIException;
+					$apiException->apiErrorMessage = $apiMeta['message'];
+					$apiException->apiStatus = $apiMeta['status'];
+					$apiException->httpStatusCode = $statusCode;
+					throw $apiException;
+				}
+			}catch(ClientException $e){
+				$jsonData = $e->getResponse()->getBody()->getContents();
+				/** @var array{error_description: string, error: string} $errorData */
+				$errorData = json_decode($jsonData, true);
+
+				$apiException = new APIException;
+				$apiException->apiErrorMessage = $errorData['error_description'];
+				$apiException->apiStatus = $errorData['error'];
+				$apiException->httpStatusCode = $e->getResponse()->getStatusCode();
+				throw $apiException;
+			}
+		}
+
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
+		public function getTokensForServiceApplication(
+			string $scope,
+			int $expiresInSeconds,
+		): RequestResponse{
+			$client = new Client();
+			$clientID = $this->clientCredentials->clientID;
+			$clientSecret = $this->clientCredentials->clientSecret;
+			$basicAuthentication = sprintf(
+				"Basic %s",
+				base64_encode(
+					sprintf(
+						"%s:%s",
+						$clientID,
+						$clientSecret,
+					),
+				),
+			);
+
+			$postParameters = [
+				"grant_type"=>"client_credentials",
+				"scope"=>$scope,
 				"expires_in"=>$expiresInSeconds,
 			];
 

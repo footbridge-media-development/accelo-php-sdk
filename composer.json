@@ -6,6 +6,9 @@
             "FootbridgeMedia\\": "src/"
         }
     },
+    "scripts": {
+        "service-auth": "@php src/Resources/CLIScripts/ServiceAuthenticate.php"
+    },
     "require": {
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.4"
