@@ -1,6 +1,7 @@
 <?php
 	namespace FootbridgeMedia\Accelo\APIRequest;
 
+	use FootbridgeMedia\Accelo\BaseObject;
 	use GuzzleHttp\Psr7\Response;
 
 	class RequestResponse{
@@ -12,6 +13,7 @@
 		public string $apiMoreInfo;
 		public bool $hasMorePages;
 		public RequestType $requestType;
+		public BaseObject $updatedObject;
 
 		// Results
 		private array $listRequestResult;
@@ -41,5 +43,13 @@
 
 		public function getListResult(): array{
 			return $this->listRequestResult;
+		}
+
+		public function setUpdatedObject(BaseObject $object): void{
+			$this->updatedObject = $object;
+		}
+
+		public function getUpdatedObject(): BaseObject{
+			return $this->updatedObject;
 		}
 	}

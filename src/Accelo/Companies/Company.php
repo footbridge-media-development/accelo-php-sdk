@@ -3,9 +3,10 @@
 	namespace FootbridgeMedia\Accelo\Companies;
 
 	use FootbridgeMedia\Accelo\Address\Address;
+	use FootbridgeMedia\Accelo\BaseObject;
 	use FootbridgeMedia\Accelo\Statuses\Status;
 
-	class Company{
+	class Company extends BaseObject {
 		public int $id;
 		public string $name;
 		public ?string $custom_id = null;

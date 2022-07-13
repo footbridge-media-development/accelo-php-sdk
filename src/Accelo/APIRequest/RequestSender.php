@@ -2,6 +2,7 @@
 	namespace FootbridgeMedia\Accelo\APIRequest;
 
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\AdditionalFields;
+	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Fields;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Filters;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Search;
 	use FootbridgeMedia\Accelo\Authentication\Authentication;
@@ -224,6 +225,93 @@
 				}
 
 				$requestResponse->setListRequest($acceloObjectsParsed);
+
+				return $requestResponse;
+			}else{
+				$responseBody = $response->getBody()->getContents();
+
+				/** @var array{response: null, meta:array} $apiResponse */
+				$apiResponse = json_decode($responseBody, true);
+				/** @var array{message: string, status: string, more_info:string} $apiMeta */
+				$apiMeta = $apiResponse['meta'];
+				$apiException = new APIException;
+				$apiException->apiErrorMessage = $apiMeta['message'];
+				$apiException->apiStatus = $apiMeta['status'];
+				$apiException->httpStatusCode = $statusCode;
+				throw $apiException;
+			}
+		}
+
+		public function update(
+			string $objectType,
+			string $path,
+			?Fields $fields,
+			?AdditionalFields $additionalFields,
+		): RequestResponse{
+
+			$client = new Client();
+
+			if ($this->authentication instanceof WebAuthentication){
+				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
+			}elseif ($this->authentication instanceof ServiceAuthentication){
+				$authorizationString = $this->getBearerAuthenticationStringFromServiceToken();
+			}
+
+			$formParams = $fields->getFieldsAsKeyValuePairs();
+
+			// Handle _fields
+			if ($additionalFields !== null){
+				$fieldsAsCommaSeparatedString = $additionalFields->getFieldsAsCommaSeparatedList();
+				if (!empty($fieldsAsCommaSeparatedString)){
+					$formParams['_fields'] = $fieldsAsCommaSeparatedString;
+				}
+			}
+
+			$response = $client->request(
+				method:"PUT",
+				uri: $this->getAPIFullURL($path),
+				options:[
+					RequestOptions::HEADERS => [
+						"Authorization"=>$authorizationString,
+					],
+					RequestOptions::FORM_PARAMS => $formParams,
+				],
+			);
+
+			$statusCode = $response->getStatusCode();
+			if ($statusCode === 200){
+
+				$headers = $response->getHeaders();
+				$responseBody = $response->getBody()->getContents();
+				$rateLimitResetTimestamp = (int) $headers['X-RateLimit-Reset'][0];
+				$rateLimitRemaining = (int) $headers['X-RateLimit-Remaining'][0];
+				$rateLimitMaxAllowedLimit = (int) $headers['X-RateLimit-Limit'][0];
+
+				/** @var array{response: array, meta:array} $apiResponse */
+				$apiResponse = json_decode($responseBody, true);
+				$updatedObjectReturned = $apiResponse['response'];
+
+				/** @var array{message: string, status: string, more_info:string} $apiMeta */
+				$apiMeta = $apiResponse['meta'];
+
+				$requestResponse = new RequestResponse;
+				$requestResponse->responseBody = $responseBody;
+				$requestResponse->httpStatus = $statusCode;
+				$requestResponse->apiStatus = $apiMeta['status'];
+				$requestResponse->apiMessage = $apiMeta['message'];
+				$requestResponse->apiMoreInfo = $apiMeta['more_info'];
+				$requestResponse->rateLimitRemaining = $rateLimitRemaining;
+				$requestResponse->rateLimitResetTimestamp = $rateLimitResetTimestamp;
+				$requestResponse->rateLimitTotalMaxAllowed = $rateLimitMaxAllowedLimit;
+				$requestResponse->requestType = RequestType::UPDATE;
+
+				$newAcceloObject = new $objectType;
+				$this->hydrateObject(
+					object: $newAcceloObject,
+					objectFromAPI: $updatedObjectReturned,
+				);
+
+				$requestResponse->setUpdatedObject($newAcceloObject);
 
 				return $requestResponse;
 			}else{
