@@ -35,6 +35,24 @@
 			self::$accelo = $accelo;
 		}
 
+		public function testGetCompanyObject(){
+
+			$companyID = 11;
+
+			$requestResponse = self::$accelo->get(
+				endpoint: "/companies/" . $companyID,
+				objectType: Company::class,
+			);
+
+			/** @var Company $company */
+			$company = $requestResponse->getFetchedObject();
+
+			$this->assertEquals(
+				expected: $companyID,
+				actual:$company->id,
+			);
+		}
+
 		public function testListCompaniesByName(){
 
 			$search = new Search();

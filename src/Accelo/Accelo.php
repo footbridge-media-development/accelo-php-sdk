@@ -88,6 +88,26 @@
 		 * @throws GuzzleException
 		 * @throws APIException
 		 */
+		public function get(
+			string $endpoint,
+			string $objectType,
+			?AdditionalFields $additionalFields = null,
+		): RequestResponse{
+			$requestSender = new RequestSender();
+			$requestSender->authentication = $this->authentication;
+			$requestSender->clientCredentials = $this->clientCredentials;
+
+			return $requestSender->getObject(
+				objectType: $objectType,
+				path: $endpoint,
+				additionalFields:$additionalFields,
+			);
+		}
+
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
 		public function list(
 			string $endpoint,
 			string $objectType,

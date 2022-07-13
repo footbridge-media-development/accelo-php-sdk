@@ -13,6 +13,7 @@
 		public string $apiMoreInfo;
 		public bool $hasMorePages;
 		public RequestType $requestType;
+		public BaseObject $fetchedObject; // From a get API call
 		public BaseObject $createdObject;
 		public BaseObject $updatedObject;
 		public BaseObject $progressedObject;
@@ -69,5 +70,13 @@
 
 		public function getCreatedObject(): BaseObject{
 			return $this->createdObject;
+		}
+
+		public function setFetchedObject(BaseObject $object): void{
+			$this->fetchedObject = $object;
+		}
+
+		public function getFetchedObject(): BaseObject{
+			return $this->fetchedObject;
 		}
 	}
