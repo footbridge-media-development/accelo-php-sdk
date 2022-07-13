@@ -3,6 +3,7 @@
 
 	use FootbridgeMedia\Accelo\APIRequest\Paginator;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\AdditionalFields;
+	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Fields;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Filters;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Search;
 	use FootbridgeMedia\Accelo\APIRequest\RequestResponse;
@@ -84,7 +85,7 @@
 		}
 
 		/**
-		 * @throws \GuzzleHttp\Exception\GuzzleException
+		 * @throws GuzzleException
 		 * @throws APIException
 		 */
 		public function list(
@@ -106,6 +107,24 @@
 				filters:$filters,
 				search: $search,
 				paginator: $paginator,
+			);
+		}
+
+		public function update(
+			string $endpoint,
+			string $objectType,
+			Fields $fields = null,
+			?AdditionalFields $additionalFields = null,
+		): RequestResponse{
+			$requestSender = new RequestSender();
+			$requestSender->authentication = $this->authentication;
+			$requestSender->clientCredentials = $this->clientCredentials;
+
+			return $requestSender->update(
+				objectType: $objectType,
+				path: $endpoint,
+				fields:$fields,
+				additionalFields: $additionalFields,
 			);
 		}
 	}

@@ -2,9 +2,10 @@
 	namespace FootbridgeMedia\Accelo\Requests;
 
 	use FootbridgeMedia\Accelo\Affiliation\Affiliation;
+	use FootbridgeMedia\Accelo\BaseObject;
 	use FootbridgeMedia\Accelo\Staff\Staff;
 
-	class Request{
+	class Request extends BaseObject {
 		public int $id;
 		public string $title;
 		public ?string $body = null;

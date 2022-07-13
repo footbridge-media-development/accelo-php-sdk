@@ -13,7 +13,11 @@
 			// Handle when a field value is provided.
 			// This means it must be provided in parentheses after the name
 			if ($fieldValue !== null){
-				$formattedFieldString .= sprintf("(%s)", $fieldValue);
+				if ($fieldValue !== "()") {
+					$formattedFieldString .= sprintf("(%s)", $fieldValue);
+				}else{
+					$formattedFieldString .= sprintf("%s", $fieldValue);
+				}
 			}
 
 			$this->fieldNames[] = $formattedFieldString;

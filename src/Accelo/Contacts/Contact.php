@@ -2,9 +2,10 @@
 
 	namespace FootbridgeMedia\Accelo\Contacts;
 
+	use FootbridgeMedia\Accelo\BaseObject;
 	use FootbridgeMedia\Accelo\Statuses\Status;
 
-	class Contact{
+	class Contact extends BaseObject {
 		public int $id;
 		public string $firstname;
 		public string $surname;

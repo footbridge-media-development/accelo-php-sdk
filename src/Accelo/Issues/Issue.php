@@ -3,12 +3,13 @@
 	namespace FootbridgeMedia\Accelo\Issues;
 
 	use FootbridgeMedia\Accelo\Affiliation\Affiliation;
+	use FootbridgeMedia\Accelo\BaseObject;
 	use FootbridgeMedia\Accelo\Companies\Company;
 	use FootbridgeMedia\Accelo\Staff\Staff;
 	use FootbridgeMedia\Accelo\Statuses\Status;
 	use FootbridgeMedia\Resources\Attributes\Deprecated;
 
-	class Issue{
+	class Issue extends BaseObject {
 		public int $id;
 		public string $title;
 		public ?string $custom_id = null;

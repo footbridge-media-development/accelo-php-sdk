@@ -3,6 +3,7 @@
 	require_once __DIR__ . "/../../test-env.php";
 
 	use FootbridgeMedia\Accelo\Accelo;
+	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Fields;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Filters;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Search;
 	use FootbridgeMedia\Accelo\Authentication\AuthenticationType;
@@ -68,6 +69,31 @@
 			$this->assertEquals(
 				expected:"Footbridge Media",
 				actual:$company->name,
+			);
+		}
+
+		public function testUpdateTestCompanyName(){
+
+			$companyID = 11;
+
+			$updateFields = new Fields();
+			$updateFields->addField(
+				fieldName: "name",
+				fieldValue:"GG Test Company",
+			);
+
+			$requestResponse = self::$accelo->update(
+				endpoint: "/companies/" . $companyID,
+				objectType: Company::class,
+				fields:$updateFields,
+			);
+
+			/** @var Company $companyUpdated */
+			$companyUpdated = $requestResponse->getUpdatedObject();
+
+			$this->assertEquals(
+				expected: "GG Test Company",
+				actual: $companyUpdated->name,
 			);
 		}
 	}
