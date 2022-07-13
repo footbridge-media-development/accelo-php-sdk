@@ -7,4 +7,5 @@
 		case LIST;
 		case UPDATE;
 		case CREATE;
+		case RUN_PROGRESSION;
 	}

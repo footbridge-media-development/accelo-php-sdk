@@ -14,6 +14,7 @@
 		public bool $hasMorePages;
 		public RequestType $requestType;
 		public BaseObject $updatedObject;
+		public BaseObject $progressedObject;
 
 		// Results
 		private array $listRequestResult;
@@ -51,5 +52,13 @@
 
 		public function getUpdatedObject(): BaseObject{
 			return $this->updatedObject;
+		}
+
+		public function setProgressedObject(BaseObject $object): void{
+			$this->progressedObject = $object;
+		}
+
+		public function getProgressedObject(): BaseObject{
+			return $this->progressedObject;
 		}
 	}

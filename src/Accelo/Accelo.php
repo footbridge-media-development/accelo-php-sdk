@@ -145,4 +145,20 @@
 				additionalFields: $additionalFields,
 			);
 		}
+
+		public function runProgression(
+			string $endpoint,
+			string $objectType,
+			?AdditionalFields $additionalFields = null,
+		): RequestResponse{
+			$requestSender = new RequestSender();
+			$requestSender->authentication = $this->authentication;
+			$requestSender->clientCredentials = $this->clientCredentials;
+
+			return $requestSender->runProgression(
+				objectType: $objectType,
+				path: $endpoint,
+				additionalFields: $additionalFields,
+			);
+		}
 	}

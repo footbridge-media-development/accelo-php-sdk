@@ -2,7 +2,10 @@
 
 	namespace FootbridgeMedia\Accelo\Issues;
 
+	use FootbridgeMedia\Accelo\Accelo;
 	use FootbridgeMedia\Accelo\Affiliation\Affiliation;
+	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\AdditionalFields;
+	use FootbridgeMedia\Accelo\APIRequest\RequestResponse;
 	use FootbridgeMedia\Accelo\BaseObject;
 	use FootbridgeMedia\Accelo\Companies\Company;
 	use FootbridgeMedia\Accelo\Staff\Staff;
@@ -48,4 +51,23 @@
 		public ?int $billable_seconds = null;
 		public int|Company|null $company = null;
 		public int|Staff|null $assignee = null;
+
+		public function runProgression(
+			Accelo $accelo,
+			int $progressionID,
+			?AdditionalFields $additionalFields = null,
+		): RequestResponse{
+			$endpoint = sprintf(
+				"/%s/%s/progressions/%d/auto",
+				"issues",
+				$this->id,
+				$progressionID,
+			);
+
+			return $accelo->runProgression(
+				endpoint: $endpoint,
+				objectType:self::class,
+				additionalFields: $additionalFields,
+			);
+		}
 	}
