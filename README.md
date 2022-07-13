@@ -227,3 +227,94 @@ if ($requestResponse->hasMorePages){
 ```
 
 As you can see at the bottom, you can use the hasMorePages boolean flag to tell if a response probably has more results to return. Then you would increment the paginator with incrementPage. You can then make the same API call with the same object filters, fields, and same paginator instance but you will receive new results.
+
+## Updating an Object
+Below is an example of updating the name of a company. You can use this pattern for any updatable object (issues, contacts, etc). The request response will have a new instance of the updated object.
+
+The response will follow the Accelo API's return of default fields only. The additionalFields parameter to return have the newly returned object have additional fields hydrated.
+```php
+$companyIDToUpdate = 11; // ID of the company to update records of
+
+$updateFields = new Fields();
+$updateFields->addField(
+    fieldName: "name",
+    fieldValue:"Company's New Name!",
+);
+
+$requestResponse = self::$accelo->update(
+    endpoint: "/companies/" . $companyID,
+    objectType: Company::class,
+    fields: $updateFields,
+    additionalFields: null,
+);
+
+/** @var Company $companyUpdated */
+$companyUpdated = $requestResponse->getUpdatedObject();
+
+print($companyUpdated->name);
+```
+
+## Creating an Object
+Creating an object is syntatically similar to updating existing objects. Again, use additionalFields to have the API response contain hydrated fields that are outside the default.
+
+This example will create a new company that is, by default, set to Inactive standing.
+```php
+$creationFields = new Fields();
+$creationFields->addField(
+    fieldName: "name",
+    fieldValue:"My New Company",
+);
+
+$creationFields->addField(
+    fieldName: "standing",
+    fieldValue: Standing::INACTIVE->value,
+);
+
+$additionalReturnFields = new AdditionalFields();
+$additionalReturnFields->addField(
+    fieldName:"standing",
+);
+
+$requestResponse = self::$accelo->create(
+    endpoint: "/companies",
+    objectType: Company::class,
+    fields:$creationFields,
+    additionalFields: $additionalReturnFields,
+);
+
+/** @var Company $newCompany */
+$newCompany = $requestResponse->getCreatedObject();
+
+print($newCompany->name);
+print($newCompany->standing);
+```
+
+## Run a Progression
+Currently, progression running is only implemented for issues (tickets). `runProgression` is a method on the object itself. It takes a dependency-injected Accelo object.
+
+Generally, you would use an existing object to call the progression on; however just like the example shows below, you can just make a blank new object with a populated ID and it will work fine.
+
+The `runProgression`'s response will follow the Accelo API's pattern in returning the progressed object from the API response. This means you can supply an additionalFields parameter for the returned object to have more than just the default fields.
+```php
+// Create a dummy object with the desired ID to run a progression on
+$issueID = 30155;
+$issue = new Issue();
+$issue->id = $issueID;
+
+$progressionID = 100; // Get this from your Accelo deployment. It would be in the URL after you click a progression on a ticket type (NOT a status)
+
+$additionalReturnFields = new AdditionalFields();
+$additionalReturnFields->addField(
+    fieldName: "status",
+);
+
+$requestResponse = $issue->runProgression(
+    accelo: self::$accelo,
+    progressionID: $testProgressionID,
+    additionalFields:$additionalReturnFields,
+);
+
+/** @var Issue $progressedIssue */
+$progressedIssue = $requestResponse->getProgressedObject();
+print($progressedIssue->status); // Will be the new status after the progression is ran
+```
