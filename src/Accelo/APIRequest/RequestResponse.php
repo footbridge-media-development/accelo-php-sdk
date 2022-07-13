@@ -13,6 +13,7 @@
 		public string $apiMoreInfo;
 		public bool $hasMorePages;
 		public RequestType $requestType;
+		public BaseObject $createdObject;
 		public BaseObject $updatedObject;
 		public BaseObject $progressedObject;
 
@@ -60,5 +61,13 @@
 
 		public function getProgressedObject(): BaseObject{
 			return $this->progressedObject;
+		}
+
+		public function setCreatedObject(BaseObject $object): void{
+			$this->createdObject = $object;
+		}
+
+		public function getCreatedObject(): BaseObject{
+			return $this->createdObject;
 		}
 	}

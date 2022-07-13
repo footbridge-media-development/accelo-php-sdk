@@ -127,7 +127,7 @@
 			);
 
 			/** @var Company $newCompany */
-			$newCompany = $requestResponse->getUpdatedObject();
+			$newCompany = $requestResponse->getCreatedObject();
 
 			$this->assertEquals(
 				expected: $testNewName,

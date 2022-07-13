@@ -402,7 +402,7 @@
 					objectFromAPI: $updatedObjectReturned,
 				);
 
-				$requestResponse->setUpdatedObject($newAcceloObject);
+				$requestResponse->setCreatedObject($newAcceloObject);
 
 				return $requestResponse;
 			}else{
