@@ -2,9 +2,10 @@
 
 	namespace FootbridgeMedia\Accelo\Activities;
 
+	use FootbridgeMedia\Accelo\BaseObject;
 	use FootbridgeMedia\Accelo\Staff\Staff;
 
-	class Activity{
+	class Activity extends BaseObject {
 
 		public int $id;
 		public string $subject;
