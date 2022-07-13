@@ -127,4 +127,22 @@
 				additionalFields: $additionalFields,
 			);
 		}
+
+		public function create(
+			string $endpoint,
+			string $objectType,
+			Fields $fields = null,
+			?AdditionalFields $additionalFields = null,
+		): RequestResponse{
+			$requestSender = new RequestSender();
+			$requestSender->authentication = $this->authentication;
+			$requestSender->clientCredentials = $this->clientCredentials;
+
+			return $requestSender->create(
+				objectType: $objectType,
+				path: $endpoint,
+				fields:$fields,
+				additionalFields: $additionalFields,
+			);
+		}
 	}

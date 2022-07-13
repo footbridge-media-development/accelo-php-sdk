@@ -1,5 +1,5 @@
 <?php
-	namespace Accelo\Standing;
+	namespace FootbridgeMedia\Accelo\Standing;
 
 	enum Standing: string{
 		case SUBMITTED = "submitted";

@@ -3,6 +3,7 @@
 	require_once __DIR__ . "/../../test-env.php";
 
 	use FootbridgeMedia\Accelo\Accelo;
+	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\AdditionalFields;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Fields;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Filters;
 	use FootbridgeMedia\Accelo\APIRequest\RequestConfigurations\Search;
@@ -10,6 +11,7 @@
 	use FootbridgeMedia\Accelo\Authentication\ServiceAuthentication;
 	use FootbridgeMedia\Accelo\ClientCredentials\ClientCredentials;
 	use FootbridgeMedia\Accelo\Companies\Company;
+	use FootbridgeMedia\Accelo\Standing\Standing;
 	use PHPUnit\Framework\TestCase;
 
 
@@ -95,5 +97,48 @@
 				expected: "GG Test Company",
 				actual: $companyUpdated->name,
 			);
+		}
+
+		public function testCreateCompany(){
+
+			$testNewName = "Garet's Test Company - " . time();
+
+			$creationFields = new Fields();
+			$creationFields->addField(
+				fieldName: "name",
+				fieldValue:$testNewName,
+			);
+
+			$creationFields->addField(
+				fieldName: "standing",
+				fieldValue: Standing::INACTIVE->value,
+			);
+
+			$additionalReturnFields = new AdditionalFields();
+			$additionalReturnFields->addField(
+				fieldName:"standing",
+			);
+
+			$requestResponse = self::$accelo->create(
+				endpoint: "/companies",
+				objectType: Company::class,
+				fields:$creationFields,
+				additionalFields: $additionalReturnFields,
+			);
+
+			/** @var Company $newCompany */
+			$newCompany = $requestResponse->getUpdatedObject();
+
+			$this->assertEquals(
+				expected: $testNewName,
+				actual: $newCompany->name,
+			);
+
+			$this->assertEquals(
+				expected: Standing::INACTIVE->value,
+				actual: $newCompany->standing,
+			);
+
+			print($newCompany->id);
 		}
 	}
