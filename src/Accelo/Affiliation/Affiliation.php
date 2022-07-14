@@ -2,7 +2,9 @@
 
 	namespace FootbridgeMedia\Accelo\Affiliation;
 
-	class Affiliation{
+	use FootbridgeMedia\Accelo\BaseObject;
+
+	class Affiliation extends BaseObject {
 
 		public int $id;
 		public string $mobile;
