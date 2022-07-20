@@ -3,12 +3,13 @@
 	namespace FootbridgeMedia\Accelo\Tasks;
 
 	use FootbridgeMedia\Accelo\Affiliation\Affiliation;
+	use FootbridgeMedia\Accelo\BaseObject;
 	use FootbridgeMedia\Accelo\Companies\Company;
 	use FootbridgeMedia\Accelo\Contacts\Contact;
 	use FootbridgeMedia\Accelo\Staff\Staff;
 	use FootbridgeMedia\Accelo\Statuses\Status;
 
-	class Task{
+	class Task extends BaseObject {
 
 		public int $id;
 		public string $title;
