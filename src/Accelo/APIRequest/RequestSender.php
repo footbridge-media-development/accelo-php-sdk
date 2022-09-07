@@ -332,6 +332,10 @@
 			}
 		}
 
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
 		public function update(
 			string $objectType,
 			string $path,
