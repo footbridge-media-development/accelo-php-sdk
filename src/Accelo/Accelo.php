@@ -28,6 +28,7 @@
 		/**
 		 * Requests an authorization from a user
 		 * @throws APIException
+		 * @throws GuzzleException
 		 */
 		public function getAuthorizationURL(string $scope): string{
 			$requestSender = new RequestSender();
@@ -130,6 +131,10 @@
 			);
 		}
 
+		/**
+		 * @throws APIException
+		 * @throws GuzzleException
+		 */
 		public function update(
 			string $endpoint,
 			string $objectType,
@@ -148,6 +153,10 @@
 			);
 		}
 
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
 		public function create(
 			string $endpoint,
 			string $objectType,
@@ -166,6 +175,10 @@
 			);
 		}
 
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
 		public function runProgression(
 			string $endpoint,
 			string $objectType,
