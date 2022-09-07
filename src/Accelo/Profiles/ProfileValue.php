@@ -2,9 +2,10 @@
 
 	namespace FootbridgeMedia\Accelo\Profiles;
 
+	use FootbridgeMedia\Accelo\BaseObject;
 	use FootbridgeMedia\Accelo\Staff\Staff;
 
-	class ProfileValue{
+	class ProfileValue extends BaseObject {
 		public int $id;
 		public string $field_type;
 		public string $field_name;
