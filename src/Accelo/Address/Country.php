@@ -2,7 +2,9 @@
 
 	namespace FootbridgeMedia\Accelo\Address;
 
-	class Country{
+	use FootbridgeMedia\Accelo\BaseObject;
+
+	class Country extends BaseObject {
 		public int $id;
 		public string $title;
 		public ?string $prefix = null;

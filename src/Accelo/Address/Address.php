@@ -2,7 +2,9 @@
 
 	namespace FootbridgeMedia\Accelo\Address;
 
-	class Address{
+	use FootbridgeMedia\Accelo\BaseObject;
+
+	class Address extends BaseObject {
 		public int $id;
 		public string $full;
 		public ?string $title = null;

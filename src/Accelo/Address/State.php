@@ -2,7 +2,9 @@
 
 	namespace FootbridgeMedia\Accelo\Address;
 
-	class State{
+	use FootbridgeMedia\Accelo\BaseObject;
+
+	class State extends BaseObject {
 		public int $id;
 		public string $title;
 		public string $abbreviation;
