@@ -7,4 +7,5 @@
 		case RESOLVED = "resolved";
 		case CLOSED = "closed";
 		case INACTIVE = "inactive";
+		case ACTIVE = "active";
 	}
