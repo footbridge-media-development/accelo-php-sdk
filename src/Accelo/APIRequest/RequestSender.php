@@ -24,9 +24,9 @@
 
 		private function getAPIFullURL(string $path): string{
 			return sprintf(
-				self::API_URL,
-				$this->clientCredentials->deploymentName
-			) . "/api/" . self::API_VERSION . $path;
+					self::API_URL,
+					$this->clientCredentials->deploymentName
+				) . "/api/" . self::API_VERSION . $path;
 		}
 
 		private function getOAuthFullURL(string $path): string{
@@ -67,13 +67,7 @@
 						$types = $declaredType->getTypes();
 						foreach($types as $type){
 							$nameOfType = $type->getName();
-							if ($nameOfType === "int"){
-								$object->{$property->name} = (int) $objectFromAPI[$property->name];
-							}elseif ($nameOfType === "string"){
-								$object->{$property->name} = (string) $objectFromAPI[$property->name];
-							}elseif ($nameOfType === "array"){
-								$object->{$property->name} = $objectFromAPI[$property->name];
-							}elseif (class_exists(class: $nameOfType)){
+							if (class_exists(class: $nameOfType)){
 								// Check if the API object is an object and not a string/int
 								// This happens in the case where a field could be - for example - the ID of a staff
 								// or the object of the staff member itself
@@ -87,7 +81,18 @@
 										objectFromAPI: $objectFromAPI[$property->name],
 									);
 									$object->{$property->name} = $newObject;
+
+									break;
 								}
+							}elseif ($nameOfType === "int"){
+								$object->{$property->name} = (int) $objectFromAPI[$property->name];
+								break;
+							}elseif ($nameOfType === "string"){
+								$object->{$property->name} = (string) $objectFromAPI[$property->name];
+								break;
+							}elseif ($nameOfType === "array"){
+								$object->{$property->name} = $objectFromAPI[$property->name];
+								break;
 							}
 						}
 					}elseif ($declaredType instanceof \ReflectionNamedType){
