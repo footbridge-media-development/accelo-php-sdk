@@ -2,7 +2,10 @@
 
 	namespace FootbridgeMedia\Accelo\Affiliation;
 
+	use FootbridgeMedia\Accelo\Address\Address;
 	use FootbridgeMedia\Accelo\BaseObject;
+	use FootbridgeMedia\Accelo\Companies\Company;
+	use FootbridgeMedia\Accelo\Contacts\Contact;
 
 	class Affiliation extends BaseObject {
 
@@ -12,9 +15,9 @@
 		public ?string $fax = null;
 		public ?string $position = null;
 		public ?string $phone = null;
-		public ?string $postal_address = null;
-		public ?string $company = null;
-		public ?string $contact = null;
+		public string|Address|null $postal_address = null;
+		public string|Company|null $company = null;
+		public string|Contact|null $contact = null;
 		public ?string $affiliation_status = null;
 		public ?string $standing = null;
 		public ?string $date_modified = null;
