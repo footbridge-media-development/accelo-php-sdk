@@ -1,7 +1,9 @@
 <?php
 	namespace FootbridgeMedia\Accelo\Resources;
 
-	class Resource{
+	use FootbridgeMedia\Accelo\BaseObject;
+
+	class Resource extends BaseObject{
 		public int $id;
 		public string $title;
 		public ?int $date_created = null;
