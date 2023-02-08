@@ -286,6 +286,17 @@
 				/** @var array{response: array, meta:array} $apiResponse */
 				$apiResponse = json_decode($responseBody, true);
 				$objectsListed = $apiResponse['response'];
+
+				/**
+				 * 2/8/2023
+				 * Handle an discrepency in the API for collections. Listing collections
+				 * will instead have a key in the response called "collections" that houses the
+				 * collections.
+				 */
+				if (array_key_exists("collections", $objectsListed)){
+					$objectsListed = $objectsListed['collections'];
+				}
+
 				$acceloObjectsParsed = [];
 
 				/** @var array{message: string, status: string, more_info:string} $apiMeta */
