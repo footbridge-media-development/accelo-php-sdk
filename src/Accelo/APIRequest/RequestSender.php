@@ -617,6 +617,10 @@
 			}
 		}
 
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
 		public function uploadResource(
 			string $objectType,
 			string $path,
