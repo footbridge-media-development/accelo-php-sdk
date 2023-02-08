@@ -17,6 +17,7 @@
 		public BaseObject $createdObject;
 		public BaseObject $updatedObject;
 		public BaseObject $progressedObject;
+		public BaseObject $uploadedObject;
 
 		// Results
 		private array $listRequestResult;
@@ -78,5 +79,13 @@
 
 		public function getFetchedObject(): BaseObject{
 			return $this->fetchedObject;
+		}
+
+		public function setUploadedObject(BaseObject $object): void{
+			$this->uploadedObject = $object;
+		}
+
+		public function getUploadedObject(): BaseObject{
+			return $this->uploadedObject;
 		}
 	}

@@ -10,6 +10,7 @@
 	use FootbridgeMedia\Accelo\APIRequest\RequestSender;
 	use FootbridgeMedia\Accelo\Authentication\Authentication;
 	use FootbridgeMedia\Accelo\ClientCredentials\ClientCredentials;
+	use FootbridgeMedia\Accelo\Resources\Resource;
 	use FootbridgeMedia\Resources\Exceptions\APIException;
 	use GuzzleHttp\Exception\GuzzleException;
 
@@ -192,6 +193,23 @@
 				objectType: $objectType,
 				path: $endpoint,
 				additionalFields: $additionalFields,
+			);
+		}
+
+		public function uploadResource(
+			string $endpoint,
+			string $fileName,
+			string $fileContents,
+		): RequestResponse{
+			$requestSender = new RequestSender();
+			$requestSender->authentication = $this->authentication;
+			$requestSender->clientCredentials = $this->clientCredentials;
+
+			return $requestSender->uploadResource(
+				objectType: Resource::class,
+				path: $endpoint,
+				fileName: $fileName,
+				fileContents: $fileContents,
 			);
 		}
 	}
