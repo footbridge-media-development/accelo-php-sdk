@@ -9,6 +9,8 @@
 	use FootbridgeMedia\Accelo\Authentication\ServiceAuthentication;
 	use FootbridgeMedia\Accelo\Authentication\WebAuthentication;
 	use FootbridgeMedia\Accelo\ClientCredentials\ClientCredentials;
+	use FootbridgeMedia\Accelo\Resources\Collection;
+	use FootbridgeMedia\Accelo\Resources\Resource;
 	use FootbridgeMedia\Resources\Exceptions\APIException;
 	use GuzzleHttp\Client;
 	use GuzzleHttp\Exception\ClientException;
@@ -286,6 +288,17 @@
 				/** @var array{response: array, meta:array} $apiResponse */
 				$apiResponse = json_decode($responseBody, true);
 				$objectsListed = $apiResponse['response'];
+
+				/**
+				 * 2/8/2023
+				 * Handle an discrepency in the API for collections. Listing collections
+				 * will instead have a key in the response called "collections" that houses the
+				 * collections.
+				 */
+				if (array_key_exists("collections", $objectsListed)){
+					$objectsListed = $objectsListed['collections'];
+				}
+
 				$acceloObjectsParsed = [];
 
 				/** @var array{message: string, status: string, more_info:string} $apiMeta */
@@ -587,6 +600,95 @@
 				);
 
 				$requestResponse->setProgressedObject($newAcceloObject);
+
+				return $requestResponse;
+			}else{
+				$responseBody = $response->getBody()->getContents();
+
+				/** @var array{response: null, meta:array} $apiResponse */
+				$apiResponse = json_decode($responseBody, true);
+				/** @var array{message: string, status: string, more_info:string} $apiMeta */
+				$apiMeta = $apiResponse['meta'];
+				$apiException = new APIException;
+				$apiException->apiErrorMessage = $apiMeta['message'];
+				$apiException->apiStatus = $apiMeta['status'];
+				$apiException->httpStatusCode = $statusCode;
+				throw $apiException;
+			}
+		}
+
+		public function uploadResource(
+			string $objectType,
+			string $path,
+			string $fileName,
+			string $fileContents,
+		): RequestResponse{
+
+			$client = new Client();
+
+			if ($this->authentication instanceof WebAuthentication){
+				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
+			}elseif ($this->authentication instanceof ServiceAuthentication){
+				$authorizationString = $this->getBearerAuthenticationStringFromServiceToken();
+			}
+
+			$response = $client->request(
+				method:"POST",
+				uri: $this->getAPIFullURL($path),
+				options:[
+					RequestOptions::HEADERS => [
+						"Authorization"=>$authorizationString,
+					],
+					RequestOptions::MULTIPART => [
+						[
+							"name"=>"resource",
+							"contents"=>$fileContents,
+							"filename"=>$fileName,
+						],
+					],
+				],
+			);
+
+			$statusCode = $response->getStatusCode();
+			if ($statusCode === 200){
+
+				$headers = $response->getHeaders();
+				$responseBody = $response->getBody()->getContents();
+				$rateLimitResetTimestamp = (int) $headers['X-RateLimit-Reset'][0];
+				$rateLimitRemaining = (int) $headers['X-RateLimit-Remaining'][0];
+				$rateLimitMaxAllowedLimit = (int) $headers['X-RateLimit-Limit'][0];
+
+				/** @var array{response: array, meta:array} $apiResponse */
+				$apiResponse = json_decode($responseBody, true);
+				$uploadedObjectReturned = $apiResponse['response'];
+
+				// Weird discrepency where there is a "resource" key in the array
+				// when uploading a resource that houses the resource
+				if (array_key_exists("resource", $uploadedObjectReturned)){
+					$uploadedObjectReturned = $uploadedObjectReturned['resource'];
+				}
+
+				/** @var array{message: string, status: string, more_info:string} $apiMeta */
+				$apiMeta = $apiResponse['meta'];
+
+				$requestResponse = new RequestResponse;
+				$requestResponse->responseBody = $responseBody;
+				$requestResponse->httpStatus = $statusCode;
+				$requestResponse->apiStatus = $apiMeta['status'];
+				$requestResponse->apiMessage = $apiMeta['message'];
+				$requestResponse->apiMoreInfo = $apiMeta['more_info'];
+				$requestResponse->rateLimitRemaining = $rateLimitRemaining;
+				$requestResponse->rateLimitResetTimestamp = $rateLimitResetTimestamp;
+				$requestResponse->rateLimitTotalMaxAllowed = $rateLimitMaxAllowedLimit;
+				$requestResponse->requestType = RequestType::UPLOAD_RESOURCE;
+
+				$newAcceloObject = new $objectType;
+				$this->hydrateObject(
+					object: $newAcceloObject,
+					objectFromAPI: $uploadedObjectReturned,
+				);
+
+				$requestResponse->setUploadedObject($newAcceloObject);
 
 				return $requestResponse;
 			}else{
