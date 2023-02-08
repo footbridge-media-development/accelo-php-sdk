@@ -196,6 +196,10 @@
 			);
 		}
 
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
 		public function uploadResource(
 			string $endpoint,
 			string $fileName,
