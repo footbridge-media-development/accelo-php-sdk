@@ -260,7 +260,7 @@
 			// Handle pagination
 			$returnLimit = Paginator::DEFAULT_LIMIT; // Used to tell the RequestResponse if there are more results
 			if ($paginator !== null){
-				$returnLimit = $paginator->getPage();
+				$returnLimit = $paginator->getLimit();
 				$queryParameters['_page'] = $paginator->getPage();
 				$queryParameters['_limit'] = $paginator->getLimit();
 			}
