@@ -18,24 +18,24 @@
 	use GuzzleHttp\RequestOptions;
 
 	class RequestSender{
-		const API_URL = "https://%s.api.accelo.com";
-		const API_VERSION = "v0";
+		private string $apiBaseUrl = "";
+		private string $apiVersion = "";
 
 		public ClientCredentials $clientCredentials;
 		public Authentication $authentication;
 
 		private function getAPIFullURL(string $path): string{
 			return sprintf(
-					self::API_URL,
+					$this->apiBaseUrl,
 					$this->clientCredentials->deploymentName
-				) . "/api/" . self::API_VERSION . $path;
+				) . "/api/" . $this->apiVersion . $path;
 		}
 
 		private function getOAuthFullURL(string $path): string{
 			return sprintf(
-					self::API_URL,
+					$this->apiBaseUrl,
 					$this->clientCredentials->deploymentName
-				) . "/oauth2/" . self::API_VERSION . $path;
+				) . "/oauth2/" . $this->apiVersion . $path;
 		}
 
 		private function getBearerAuthenticationStringFromWebToken(): string{
@@ -119,6 +119,22 @@
 					}
 				}
 			}
+		}
+
+		public function setAPIBaseUrl(string $baseURL): void{
+			$this->apiBaseUrl = $baseURL;
+		}
+
+		public function getAPIBaseUrl(): string{
+			return $this->apiBaseUrl;
+		}
+
+		public function setAPIVersionString(string $versionString): void{
+			$this->apiVersion = $versionString;
+		}
+
+		public function getAPIVersionString(): string{
+			return $this->apiVersion;
 		}
 
 		/**
