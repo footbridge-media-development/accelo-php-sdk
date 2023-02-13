@@ -298,6 +298,12 @@
 				if (array_key_exists("collections", $objectsListed)){
 					$objectsListed = $objectsListed['collections'];
 				}
+				/**
+				 * Same as above for periods.
+				 */
+				elseif (array_key_exists("periods", $objectsListed)){
+					$objectsListed = $objectsListed['periods'];
+				}
 
 				$acceloObjectsParsed = [];
 
