@@ -15,8 +15,26 @@
 	use GuzzleHttp\Exception\GuzzleException;
 
 	class Accelo{
+		private string $apiBaseUrl = "https://%s.api.accelo.com";
+		private string $apiVersion = "v0";
 		private ClientCredentials $clientCredentials;
 		private Authentication $authentication;
+
+		public function setAPIBaseUrl(string $baseURL): void{
+			$this->apiBaseUrl = $baseURL;
+		}
+
+		public function getAPIBaseUrl(): string{
+			return $this->apiBaseUrl;
+		}
+
+		public function setAPIVersionString(string $versionString): void{
+			$this->apiVersion = $versionString;
+		}
+
+		public function getAPIVersionString(): string{
+			return $this->apiVersion;
+		}
 
 		public function setCredentials(ClientCredentials $clientCredentials): void{
 			$this->clientCredentials = $clientCredentials;
@@ -33,6 +51,8 @@
 		 */
 		public function getAuthorizationURL(string $scope): string{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->clientCredentials = $this->clientCredentials;
 
 			$requestResponse = $requestSender->getAuthorizationURL(
@@ -52,6 +72,8 @@
 			int $expiresInSeconds,
 		): array{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->clientCredentials = $this->clientCredentials;
 
 			$requestResponse = $requestSender->getTokensFromAccessCode(
@@ -74,6 +96,8 @@
 			int $expiresInSeconds,
 		): array{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->clientCredentials = $this->clientCredentials;
 
 			$requestResponse = $requestSender->getTokensForServiceApplication(
@@ -96,6 +120,8 @@
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->authentication = $this->authentication;
 			$requestSender->clientCredentials = $this->clientCredentials;
 
@@ -119,6 +145,8 @@
 			?Paginator $paginator = null,
 		): RequestResponse{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->authentication = $this->authentication;
 			$requestSender->clientCredentials = $this->clientCredentials;
 
@@ -143,6 +171,8 @@
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->authentication = $this->authentication;
 			$requestSender->clientCredentials = $this->clientCredentials;
 
@@ -165,6 +195,8 @@
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->authentication = $this->authentication;
 			$requestSender->clientCredentials = $this->clientCredentials;
 
@@ -186,6 +218,8 @@
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->authentication = $this->authentication;
 			$requestSender->clientCredentials = $this->clientCredentials;
 
@@ -206,6 +240,8 @@
 			string $fileContents,
 		): RequestResponse{
 			$requestSender = new RequestSender();
+			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$requestSender->setAPIVersionString($this->getAPIVersionString());
 			$requestSender->authentication = $this->authentication;
 			$requestSender->clientCredentials = $this->clientCredentials;
 
