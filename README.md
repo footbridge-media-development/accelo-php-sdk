@@ -318,3 +318,17 @@ $requestResponse = $issue->runProgression(
 $progressedIssue = $requestResponse->getProgressedObject();
 print($progressedIssue->status); // Will be the new status after the progression is ran
 ```
+
+## Modifying API URL for Mock Server Testing
+You can modify the base API URL and/or version string that the requests will be sent to in order to setup mock servers for API testing.
+
+The Accelo object has the following methods to set and get the API base URL (do not include an appended forward slash) and the API version string (E.g. "v0"):
+```php
+$accelo->setAPIBaseUrl("https://...");
+$accelo->setAPIVersionString("v0");
+
+// Getters
+$accelo->getAPIBaseUrl();
+$accelo->getAPIVersionString();
+```
+By default, you **do not** need to set these as they are defined for you. If you want to override these, do so before making requests against any methods. Additionally, this naturally overrides the oAuth API endpoint.
