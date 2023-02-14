@@ -8,6 +8,7 @@
 		case LIST;
 		case UPDATE;
 		case CREATE;
+		case DELETE;
 		case UPLOAD_RESOURCE;
 		case RUN_PROGRESSION;
 	}
