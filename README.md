@@ -289,6 +289,14 @@ print($newCompany->name);
 print($newCompany->standing);
 ```
 
+## Deleting an object
+Deleting an object doesn't return a resource, so no objectType needs to be passed in. Not all objects can be deleted.
+```php
+self::$accelo->delete(
+    endpoint: "/companies/1",
+);
+```
+
 ## Run a Progression
 Currently, progression running is only implemented for issues (tickets). `runProgression` is a method on the object itself. It takes a dependency-injected Accelo object.
 
