@@ -24,6 +24,10 @@
 		public ClientCredentials $clientCredentials;
 		public Authentication $authentication;
 
+		public function __construct(private readonly Client $client = new Client())
+		{
+		}
+
 		private function getAPIFullURL(string $path): string{
 			return sprintf(
 					$this->apiBaseUrl,
@@ -147,8 +151,6 @@
 			?AdditionalFields $additionalFields,
 		): RequestResponse{
 
-			$client = new Client();
-
 			if ($this->authentication instanceof WebAuthentication){
 				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
 			}elseif ($this->authentication instanceof ServiceAuthentication){
@@ -165,7 +167,7 @@
 				}
 			}
 
-			$response = $client->request(
+			$response = $this->client->request(
 				method:"GET",
 				uri: $this->getAPIFullURL($path),
 				options:[
@@ -240,8 +242,6 @@
 			?Paginator $paginator,
 		): RequestResponse{
 
-			$client = new Client();
-
 			if ($this->authentication instanceof WebAuthentication){
 				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
 			}elseif ($this->authentication instanceof ServiceAuthentication){
@@ -281,7 +281,7 @@
 				$queryParameters['_limit'] = $paginator->getLimit();
 			}
 
-			$response = $client->request(
+			$response = $this->client->request(
 				method:"GET",
 				uri: $this->getAPIFullURL($path),
 				options:[
@@ -383,8 +383,6 @@
 			?AdditionalFields $additionalFields,
 		): RequestResponse{
 
-			$client = new Client();
-
 			if ($this->authentication instanceof WebAuthentication){
 				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
 			}elseif ($this->authentication instanceof ServiceAuthentication){
@@ -401,7 +399,7 @@
 				}
 			}
 
-			$response = $client->request(
+			$response = $this->client->request(
 				method:"PUT",
 				uri: $this->getAPIFullURL($path),
 				options:[
@@ -474,8 +472,6 @@
 			?AdditionalFields $additionalFields,
 		): RequestResponse{
 
-			$client = new Client();
-
 			if ($this->authentication instanceof WebAuthentication){
 				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
 			}elseif ($this->authentication instanceof ServiceAuthentication){
@@ -492,7 +488,7 @@
 				}
 			}
 
-			$response = $client->request(
+			$response = $this->client->request(
 				method:"POST",
 				uri: $this->getAPIFullURL($path),
 				options:[
@@ -564,8 +560,6 @@
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
 
-			$client = new Client();
-
 			if ($this->authentication instanceof WebAuthentication){
 				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
 			}elseif ($this->authentication instanceof ServiceAuthentication){
@@ -577,7 +571,7 @@
 				$formParams['_fields'] = $additionalFields->getFieldsAsCommaSeparatedList();
 			}
 
-			$response = $client->request(
+			$response = $this->client->request(
 				method:"POST",
 				uri: $this->getAPIFullURL($path),
 				options:[
@@ -650,15 +644,13 @@
 			string $fileContents,
 		): RequestResponse{
 
-			$client = new Client();
-
 			if ($this->authentication instanceof WebAuthentication){
 				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
 			}elseif ($this->authentication instanceof ServiceAuthentication){
 				$authorizationString = $this->getBearerAuthenticationStringFromServiceToken();
 			}
 
-			$response = $client->request(
+			$response = $this->client->request(
 				method:"POST",
 				uri: $this->getAPIFullURL($path),
 				options:[
@@ -739,7 +731,6 @@
 			string $scope,
 		): RequestResponse{
 
-			$client = new Client();
 			$clientID = $this->clientCredentials->clientID;
 
 			$postParameters = [
@@ -749,7 +740,7 @@
 			];
 
 			try {
-				$response = $client->request(
+				$response = $this->client->request(
 					method: "POST",
 					uri: $this->getOAuthFullURL("/authorize"),
 					options: [
@@ -789,7 +780,6 @@
 			int $expiresInSeconds,
 		): RequestResponse{
 
-			$client = new Client();
 			$clientID = $this->clientCredentials->clientID;
 			$clientSecret = $this->clientCredentials->clientSecret;
 			$basicAuthentication = sprintf(
@@ -810,7 +800,7 @@
 			];
 
 			try {
-				$response = $client->request(
+				$response = $this->client->request(
 					method: "POST",
 					uri: $this->getOAuthFullURL("/token"),
 					options: [
@@ -863,7 +853,6 @@
 			string $scope,
 			int $expiresInSeconds,
 		): RequestResponse{
-			$client = new Client();
 			$clientID = $this->clientCredentials->clientID;
 			$clientSecret = $this->clientCredentials->clientSecret;
 			$basicAuthentication = sprintf(
@@ -884,7 +873,7 @@
 			];
 
 			try {
-				$response = $client->request(
+				$response = $this->client->request(
 					method: "POST",
 					uri: $this->getOAuthFullURL("/token"),
 					options: [
