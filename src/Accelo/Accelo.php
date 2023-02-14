@@ -20,6 +20,10 @@
 		private ClientCredentials $clientCredentials;
 		private Authentication $authentication;
 
+		public function __construct(private readonly RequestSender $requestSender = new RequestSender())
+		{
+		}
+
 		public function setAPIBaseUrl(string $baseURL): void{
 			$this->apiBaseUrl = $baseURL;
 		}
@@ -50,12 +54,11 @@
 		 * @throws GuzzleException
 		 */
 		public function getAuthorizationURL(string $scope): string{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			$requestResponse = $requestSender->getAuthorizationURL(
+			$requestResponse = $this->requestSender->getAuthorizationURL(
 				scope: $scope,
 			);
 
@@ -71,12 +74,11 @@
 			string $accessCode,
 			int $expiresInSeconds,
 		): array{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			$requestResponse = $requestSender->getTokensFromAccessCode(
+			$requestResponse = $this->requestSender->getTokensFromAccessCode(
 				accessCode: $accessCode,
 				expiresInSeconds: $expiresInSeconds,
 			);
@@ -95,12 +97,11 @@
 			string $scope,
 			int $expiresInSeconds,
 		): array{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			$requestResponse = $requestSender->getTokensForServiceApplication(
+			$requestResponse = $this->requestSender->getTokensForServiceApplication(
 				scope: $scope,
 				expiresInSeconds: $expiresInSeconds,
 			);
@@ -119,13 +120,12 @@
 			string $objectType,
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->authentication = $this->authentication;
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->authentication = $this->authentication;
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			return $requestSender->getObject(
+			return $this->requestSender->getObject(
 				objectType: $objectType,
 				path: $endpoint,
 				additionalFields:$additionalFields,
@@ -144,13 +144,12 @@
 			?Search $search = null,
 			?Paginator $paginator = null,
 		): RequestResponse{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->authentication = $this->authentication;
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->authentication = $this->authentication;
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			return $requestSender->listObjects(
+			return $this->requestSender->listObjects(
 				objectType: $objectType,
 				path: $endpoint,
 				fields:$additionalFields,
@@ -170,13 +169,12 @@
 			Fields $fields = null,
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->authentication = $this->authentication;
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->authentication = $this->authentication;
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			return $requestSender->update(
+			return $this->requestSender->update(
 				objectType: $objectType,
 				path: $endpoint,
 				fields:$fields,
@@ -194,13 +192,12 @@
 			Fields $fields = null,
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->authentication = $this->authentication;
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->authentication = $this->authentication;
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			return $requestSender->create(
+			return $this->requestSender->create(
 				objectType: $objectType,
 				path: $endpoint,
 				fields:$fields,
@@ -217,13 +214,12 @@
 			string $objectType,
 			?AdditionalFields $additionalFields = null,
 		): RequestResponse{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->authentication = $this->authentication;
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->authentication = $this->authentication;
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			return $requestSender->runProgression(
+			return $this->requestSender->runProgression(
 				objectType: $objectType,
 				path: $endpoint,
 				additionalFields: $additionalFields,
@@ -239,13 +235,12 @@
 			string $fileName,
 			string $fileContents,
 		): RequestResponse{
-			$requestSender = new RequestSender();
-			$requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
-			$requestSender->setAPIVersionString($this->getAPIVersionString());
-			$requestSender->authentication = $this->authentication;
-			$requestSender->clientCredentials = $this->clientCredentials;
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->authentication = $this->authentication;
+			$this->requestSender->clientCredentials = $this->clientCredentials;
 
-			return $requestSender->uploadResource(
+			return $this->requestSender->uploadResource(
 				objectType: Resource::class,
 				path: $endpoint,
 				fileName: $fileName,
