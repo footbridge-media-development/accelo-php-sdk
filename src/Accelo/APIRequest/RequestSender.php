@@ -554,6 +554,72 @@
 		 * @throws GuzzleException
 		 * @throws APIException
 		 */
+		public function delete(
+			string $path,
+		): RequestResponse{
+
+			if ($this->authentication instanceof WebAuthentication){
+				$authorizationString = $this->getBearerAuthenticationStringFromWebToken();
+			}elseif ($this->authentication instanceof ServiceAuthentication){
+				$authorizationString = $this->getBearerAuthenticationStringFromServiceToken();
+			}
+
+			$response = $this->client->request(
+				method:"DELETE",
+				uri: $this->getAPIFullURL($path),
+				options:[
+					RequestOptions::HEADERS => [
+						"Authorization"=>$authorizationString,
+					],
+				],
+			);
+
+			$statusCode = $response->getStatusCode();
+			if ($statusCode === 200){
+
+				$headers = $response->getHeaders();
+				$responseBody = $response->getBody()->getContents();
+				$rateLimitResetTimestamp = (int) $headers['X-RateLimit-Reset'][0];
+				$rateLimitRemaining = (int) $headers['X-RateLimit-Remaining'][0];
+				$rateLimitMaxAllowedLimit = (int) $headers['X-RateLimit-Limit'][0];
+
+				/** @var array{meta:array} $apiResponse */
+				$apiResponse = json_decode($responseBody, true);
+
+				/** @var array{message: string, status: string, more_info:string} $apiMeta */
+				$apiMeta = $apiResponse['meta'];
+
+				$requestResponse = new RequestResponse;
+				$requestResponse->responseBody = $responseBody;
+				$requestResponse->httpStatus = $statusCode;
+				$requestResponse->apiStatus = $apiMeta['status'];
+				$requestResponse->apiMessage = $apiMeta['message'];
+				$requestResponse->apiMoreInfo = $apiMeta['more_info'];
+				$requestResponse->rateLimitRemaining = $rateLimitRemaining;
+				$requestResponse->rateLimitResetTimestamp = $rateLimitResetTimestamp;
+				$requestResponse->rateLimitTotalMaxAllowed = $rateLimitMaxAllowedLimit;
+				$requestResponse->requestType = RequestType::DELETE;
+
+				return $requestResponse;
+			}else{
+				$responseBody = $response->getBody()->getContents();
+
+				/** @var array{meta:array} $apiResponse */
+				$apiResponse = json_decode($responseBody, true);
+				/** @var array{message: string, status: string, more_info:string} $apiMeta */
+				$apiMeta = $apiResponse['meta'];
+				$apiException = new APIException;
+				$apiException->apiErrorMessage = $apiMeta['message'];
+				$apiException->apiStatus = $apiMeta['status'];
+				$apiException->httpStatusCode = $statusCode;
+				throw $apiException;
+			}
+		}
+
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
 		public function runProgression(
 			string $objectType,
 			string $path,

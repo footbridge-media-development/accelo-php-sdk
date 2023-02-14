@@ -209,6 +209,23 @@
 		 * @throws GuzzleException
 		 * @throws APIException
 		 */
+		public function delete(
+			string $endpoint,
+		): RequestResponse{
+			$this->requestSender->setAPIBaseUrl($this->getAPIBaseUrl());
+			$this->requestSender->setAPIVersionString($this->getAPIVersionString());
+			$this->requestSender->authentication = $this->authentication;
+			$this->requestSender->clientCredentials = $this->clientCredentials;
+
+			return $this->requestSender->delete(
+				path: $endpoint,
+			);
+		}
+
+		/**
+		 * @throws GuzzleException
+		 * @throws APIException
+		 */
 		public function runProgression(
 			string $endpoint,
 			string $objectType,
