@@ -108,7 +108,7 @@
 							$object->{$property->name} = (int) $objectFromAPI[$property->name];
 						}elseif ($nameOfType === "string"){
 							$object->{$property->name} = (string) $objectFromAPI[$property->name];
-						}elseif ($nameOfType === "array"){
+						}elseif ($nameOfType === "array" || $nameOfType === "mixed") {
 							$object->{$property->name} = $objectFromAPI[$property->name];
 						}elseif (class_exists(class: $nameOfType)){
 							// It's a class type
